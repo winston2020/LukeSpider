@@ -11,6 +11,13 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+
+
+
+Route::get('/','HomeController@index');
+
+Route::get('/list_{id}','HomeController@lists');
+
+Route::get('/show_{id}.html','HomeController@show');
+
+Route::get('/sitemap.html','SitemapController@index');

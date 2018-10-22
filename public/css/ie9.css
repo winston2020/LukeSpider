@@ -1,0 +1,21 @@
+﻿/* �����IE9  */
+@media screen\0{
+	.indexBanner .image img{min-width:auto!important;}
+	
+	.am-list-item-hd a{
+		height:26px;line-height:26px;
+	}
+	.am-list-news-hd{padding-top:18px;}
+	.jianDianWraper .jd_imgLink{max-height:240px;}
+	
+	.am-tabs-default .am-tabs-nav a{
+		line-height:42px;
+	}
+	.news-word-dt li{
+		height:52px;
+	}
+	.index_UL_TextLink li a{
+		height:32px;line-height:32px;
+	}
+	
+}
