@@ -87,7 +87,6 @@ class SpiderController extends Controller
         ini_set('memory_limit', -1);
 //        $this->title = Title::select('href')->get();
         $this->title = Title::select('href')->get();
-//        dd($this->title[1]);
         $this->totalPageCount = count($this->title);
         $client = new Client();
         $requests = function ($total) use ($client) {
@@ -98,25 +97,35 @@ class SpiderController extends Controller
             }
         };
         $pool = new Pool($client, $requests($this->totalPageCount), [
-
             'concurrency' => $this->concurrency,
             'fulfilled'   => function ($response, $index){
-                $file = @fopen(public_path('body/txt1018.txt'),'a');
+//                $file = @fopen(public_path('body/txt1018.txt'),'a');
                 echo '爬取'.$this->title[$index]->href;
                 echo '<br>';
                 ob_flush();
                 flush();
                 try{
-                    $http = $response->getBody()->getContents();
+                    $http =  $response->getBody()->getContents();
                 } catch(\Exception $e) { // I guess its InvalidArgumentException in this case
                     $this->countedAndCheckEnded();
                 }
+                $crawler = new Crawler();
+                $crawler->addHtmlContent($http);
                 $data['title'] = $this->gettitle($http);
+                $data['author'] = '游戏资讯';
+                $data['keywords'] = $crawler->filter('head > meta:nth-child(12)')->attr('content');
+                $data['description'] = $crawler->filter('body > metags')->attr('content');
                 $data['content'] = $this->getbody($http);
+                $data['comuln_id'] = 1;
+                dd($data['title']);
 
-                $txt = $data['title'].'#######'.$this->chuli($data['content']).chr(10);
-                $bool = fwrite($file,$txt);
-                fclose($file);
+
+
+
+//                $txt = $data['title'].'#######'.$this->chuli($data['content']).chr(10);
+//                $bool = fwrite($file,$txt);
+                $bool = DB::table('content')->insert($data);
+//                fclose($file);
                 if ($bool){
                     echo 'save success';
                     echo '<br>';
@@ -150,7 +159,7 @@ class SpiderController extends Controller
     function gettitle($html){
 
         echo '正在截取标题'.'<br>';
-        $str = substr($html,strpos($html,'<h1 id="artical_topic">'));
+        $str = substr($html,strpos($html,'<h1>'));
         $h1 = substr($str,0,strpos($str,'</h1>')+5);
         $t = substr($h1,23);
         $title = substr($t,0,strpos($t,'</h1>'));
@@ -164,8 +173,8 @@ class SpiderController extends Controller
 
 
         echo '正在截取文章内容'.'<br>';
-        $t = substr($ta,strpos($ta,'<!--mainContent begin-->')+24);
-        $t = substr($t,0,strpos($t,'<!--mainContent end-->'));
+        $t = substr($ta,strpos($ta,'<div class="paper-header">')+26);
+        $t = substr($t,0,strpos($t,'</div>'));
         echo '截取成功！！'.'<br>';
         return $t;
     }
