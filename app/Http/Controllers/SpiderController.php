@@ -125,18 +125,20 @@ class SpiderController extends Controller
                 }
                 $data['content'] = $this->getbody($http);
                 $data['comuln_id'] = 1;
+                $data['created_at'] = date('Y-m-d');
+                $data['update_at'] = date('Y-m-d');
 
 
 
 
 //                $txt = $data['title'].'#######'.$this->chuli($data['content']).chr(10);
 //                $bool = fwrite($file,$txt);
-                try{
+//                try{
                     $bool = DB::table('content')->insert($data);
-                }catch (\Exception $e){
-                    $bool = false;
-                    echo '插入错误，跳过';
-                }
+//                }catch (\Exception $e){
+//                    $bool = false;
+//                    echo '插入错误，跳过';
+//                }
 //                fclose($file);
                 if ($bool){
                     echo 'save success';
