@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Content;
-use App\Title;
+use App\title;
 use GuzzleHttp\Client;
 use GuzzleHttp\Pool;
 use Illuminate\Support\Facades\DB;
@@ -55,13 +55,13 @@ class SpiderController extends Controller
                     $crawler->addHtmlContent($http);
                     $arr = $crawler->filter('body > div.main > div:nth-child(4) > div.struct_cleft.content_news > div.news_list')->each(function ($node,$i) use ($http) {
                         $data['href'] = $node->filter('dl > dd > h4 > a')->attr('href');
-                            $data['title'] = $node->filter('dl > dd > h4 > a')->text();
+                        $data['title'] = $node->filter('dl > dd > h4 > a')->text();
 //                            $data['author'] = $node->filter('li > div.r_info > div.furt > span.zuozhe')->text();
-                            $data['created_at'] = date('Y-m-d H:i:s');
-                            $data['updated_at'] = date('Y-m-d H:i:s');
+                        $data['created_at'] = date('Y-m-d H:i:s');
+                        $data['updated_at'] = date('Y-m-d H:i:s');
 //                            $data['webid'] = 4;
 //                        dd($data);
-                            return $data;
+                        return $data;
                     });
                     $bool = DB::table('title')->insert($arr);
                     echo $bool;
@@ -113,18 +113,30 @@ class SpiderController extends Controller
                 $crawler->addHtmlContent($http);
                 $data['title'] = $this->gettitle($http);
                 $data['author'] = '游戏资讯';
-                $data['keywords'] = $crawler->filter('head > meta:nth-child(12)')->attr('content');
-                $data['description'] = $crawler->filter('body > metags')->attr('content');
+                try{
+                    $data['keywords'] = $crawler->filter('head > meta:nth-child(12)')->attr('content');
+                }catch (\Exception $e){
+                    $data['keywords'] = '游戏资讯';
+                }
+                try{
+                    $data['description'] = $crawler->filter('body > metags')->attr('content');
+                }catch (\Exception $e){
+                    $data['description'] = $this->gettitle($http);
+                }
                 $data['content'] = $this->getbody($http);
                 $data['comuln_id'] = 1;
-                dd($data['title']);
 
 
 
 
 //                $txt = $data['title'].'#######'.$this->chuli($data['content']).chr(10);
 //                $bool = fwrite($file,$txt);
-                $bool = DB::table('content')->insert($data);
+                try{
+                    $bool = DB::table('content')->insert($data);
+                }catch (\Exception $e){
+                    $bool = false;
+                    echo '插入错误，跳过';
+                }
 //                fclose($file);
                 if ($bool){
                     echo 'save success';
@@ -173,7 +185,7 @@ class SpiderController extends Controller
 
 
         echo '正在截取文章内容'.'<br>';
-        $t = substr($ta,strpos($ta,'<div class="paper-header">')+26);
+        $t = substr($ta,strpos($ta,'<div class="paper-content">')+26);
         $t = substr($t,0,strpos($t,'</div>'));
         echo '截取成功！！'.'<br>';
         return $t;
