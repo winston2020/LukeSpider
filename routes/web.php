@@ -13,6 +13,8 @@
 
 
 
+Route::get('title','SpiderController@title');
+
 Route::get('content','SpiderController@content');
 
 Route::get('/','HomeController@index');

@@ -42,6 +42,16 @@ class SitemapController extends Controller
     }
 
 
+    function indextwo(){
+        $host = Yuming::where(['host'=>$this->domain])->fitst();
+        $content = Content::take(500)->orderBy('updated_at', 'desc')->get();
+        return response()->view('sitemap.index', [
+            'host' => $host,
+            'content'=>$content,
+        ])->header('Content-Type', 'text/xml');
+    }
+
+
 
 
 

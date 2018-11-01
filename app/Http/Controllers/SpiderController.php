@@ -22,8 +22,8 @@ class SpiderController extends Controller
     {
         set_time_limit(0);
         ini_set('memory_limit', '128M');
-        for ($i=1;$i<101;$i++){
-            $this->url[] = 'http://news.18183.com/list_218_'.$i.'.html';
+        for ($i=1;$i<852;$i++){
+            $this->url[] = 'http://minecraft.yxzoo.com/gl_'.$i;
         }
         $this->totalPageCount = 1500;
         $client = new Client();
@@ -46,16 +46,16 @@ class SpiderController extends Controller
                 flush();
                 try{
 //                    dd($response->getBody()->getContents());
-                    $http = iconv('utf-8', 'UTF-8', $response->getBody()->getContents());
+                    $http = $response->getBody()->getContents();
                 }catch (\Exception $e){
                     echo '没有找到数据';
                 }
                 if(!empty($http)){
                     $crawler = new Crawler();
                     $crawler->addHtmlContent($http);
-                    $arr = $crawler->filter('body > div.main > div:nth-child(4) > div.struct_cleft.content_news > div.news_list')->each(function ($node,$i) use ($http) {
-                        $data['href'] = $node->filter('dl > dd > h4 > a')->attr('href');
-                        $data['title'] = $node->filter('dl > dd > h4 > a')->text();
+                    $arr = $crawler->filter('#list > dl')->each(function ($node,$i) use ($http) {
+                        $data['href'] = $node->filter('dt > a')->attr('href');
+                        $data['title'] = $node->filter('dt > a')->text();
 //                            $data['author'] = $node->filter('li > div.r_info > div.furt > span.zuozhe')->text();
                         $data['created_at'] = date('Y-m-d H:i:s');
                         $data['updated_at'] = date('Y-m-d H:i:s');
@@ -105,40 +105,42 @@ class SpiderController extends Controller
                 ob_flush();
                 flush();
                 try{
-                    $http =  $response->getBody()->getContents();
+                    $http =  iconv('utf-8','UTF-8',$response->getBody()->getContents());
                 } catch(\Exception $e) { // I guess its InvalidArgumentException in this case
                     $this->countedAndCheckEnded();
                 }
                 $crawler = new Crawler();
                 $crawler->addHtmlContent($http);
                 $data['title'] = $this->gettitle($http);
-                $data['author'] = '游戏资讯';
+                $data['author'] = '我的世界';
                 try{
                     $data['keywords'] = $crawler->filter('head > meta:nth-child(12)')->attr('content');
                 }catch (\Exception $e){
-                    $data['keywords'] = '游戏资讯';
+                    $data['keywords'] = '我的世界';
                 }
                 try{
-                    $data['description'] = $crawler->filter('body > metags')->attr('content');
+                    $data['description'] = $crawler->filter('head > meta:nth-child(3)')->attr('content');
                 }catch (\Exception $e){
                     $data['description'] = $this->gettitle($http);
                 }
                 $data['content'] = $this->getbody($http);
-                $data['comuln_id'] = 1;
+
+                $data['comuln_id'] = 3;
                 $data['created_at'] = date('Y-m-d');
-                $data['update_at'] = date('Y-m-d');
+                $data['updated_at'] = date('Y-m-d');
 
 
 
 
 //                $txt = $data['title'].'#######'.$this->chuli($data['content']).chr(10);
 //                $bool = fwrite($file,$txt);
-//                try{
-                    $bool = DB::table('content')->insert($data);
-//                }catch (\Exception $e){
-//                    $bool = false;
-//                    echo '插入错误，跳过';
-//                }
+                try{
+                    $bool = DB::table('sp_content')->insert($data);
+                }catch (\Exception $e){
+                    dd($e);
+                    $bool = false;
+                    echo '插入错误，跳过';
+                }
 //                fclose($file);
                 if ($bool){
                     echo 'save success';
@@ -178,6 +180,7 @@ class SpiderController extends Controller
         $t = substr($h1,23);
         $title = substr($t,0,strpos($t,'</h1>'));
         echo '截取成功！！'.'<br>';
+        echo $title.'<br>';
         return $title;
     }
 
@@ -187,7 +190,7 @@ class SpiderController extends Controller
 
 
         echo '正在截取文章内容'.'<br>';
-        $t = substr($ta,strpos($ta,'<div class="paper-content">')+26);
+        $t = substr($ta,strpos($ta,'<div id="content">')+18);
         $t = substr($t,0,strpos($t,'</div>'));
         echo '截取成功！！'.'<br>';
         return $t;
