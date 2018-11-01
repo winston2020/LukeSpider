@@ -24,3 +24,5 @@ Route::get('/list_{id}','HomeController@lists');
 Route::get('/show_{id}.html','HomeController@show');
 
 Route::get('/sitemap.html','SitemapController@index');
+
+Route::get('/sitemap.xml','SitemapController@indextwo');
