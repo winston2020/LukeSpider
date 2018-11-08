@@ -101,7 +101,7 @@
             <div class="am-u-md-6 am-u-sm-12 am-u-md-pull-6">
                 <ol class="am-breadcrumb am-breadcrumb-slash">
                     <li><a href="http://{{$host->host}}/">首页</a></li>
-                    <li><a href="http://{{$host->hos}}/list_{{$now->id}}">{{$now->name}}</a></li>
+                    <li><a href="http://{{$host->host}}/list_{{$now->id}}">{{$now->name}}</a></li>
                     <li>正文</li>
                 </ol>
             </div>
