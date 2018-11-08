@@ -108,6 +108,7 @@ class HomeController extends Controller
     }
 
     function show($id){
+        
         $this->writespider();
         $content = Content::where(['id' => $id])->first();
         $host = Yuming::where(['host'=>$this->domain])->first();
@@ -115,11 +116,12 @@ class HomeController extends Controller
         $a = self::object_to_array($count[0]);
         $count = $a['count(1)'];
         $id = rand(0,$count);
-        $other = DB::table('content')->where('id', '>', $id)->limit(250)->get()->toArray();
+        $other = DB::table('content')->where('id', '>', $id)->limit(2500)->get()->toArray();
         $comuln = Comuln::all();
         $now = Comuln::where(['id' => $content->comuln_id])->first();
 
         return view($host->temp.'.show')->with(['content'=>$content,'outlink'=>$this->outlink,'other'=>$other,'host'=>$host,'comuln'=>$comuln,'now'=>$now]);
+
     }
 
 

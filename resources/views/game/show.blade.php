@@ -202,7 +202,29 @@
                 </div>
             </div>
         </div>
+
     </div>
+
+    {{--outlink start--}}
+    <style>
+        .links{
+            border: #dedede 1px solid;
+            border-bottom: none;
+            border-left: none;
+            border-right: none;
+        }
+    </style>
+    <div style="width: 60%;margin-left: 20%;height: 100px;">
+        <div style="font-weight: bolder">友情链接</div>
+        <div class="links">
+            @for($i=0;$i<15;$i++)
+            <a href="">testing</a>
+            <span style="color: #cccccc;padding:0 3px">|</span>
+            @endfor
+        </div>
+    </div>
+    {{--outlink end--}}
+
     <!--foot start-->
     <div class="layout-footer">
         <div class="footer">

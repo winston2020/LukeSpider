@@ -7,5 +7,5 @@ use Illuminate\Database\Eloquent\Model;
 class Content extends Model
 {
     //
-    protected $table = 'sp_content';
+    protected $table = 'content';
 }

@@ -22,9 +22,9 @@ class SpiderController extends Controller
     {
         set_time_limit(0);
         ini_set('memory_limit', '128M');
-        for ($i=1;$i<1764;$i++){
-            $this->url[] = 'https://www.newyx.net/news/list'.$i.'htm';
-//            $this->url[] = 'https://www.autotimes.com.cn/news/'.$i.'html';
+
+        for ($i=1;$i<50;$i++){
+            $this->url[] = 'https://www.newyx.net/news/list_'.$i.'.htm';
         }
         $this->totalPageCount = 1500;
         $client = new Client();
@@ -54,10 +54,11 @@ class SpiderController extends Controller
                 if(!empty($http)){
                     $crawler = new Crawler();
                     $crawler->addHtmlContent($http);
-                    dd(123);
-                    $arr = $crawler->filter('body > div.auto_wz_1 > div > div > div.auto_wz_3 > div.auto_wz_5')->each(function ($node,$i) use ($http) {
-                        $data['href'] = $node->filter('div.auto_wz_6 > a')->attr('href');
-                        $data['title'] = $node->filter('div.auto_wz_6 > a')->text();
+
+                    dd(1);
+                    $arr = $crawler->filter('#pc-game > div.wrap1120.mt30.cl > div.w750.Mid2_L > ul > li')->each(function ($node,$i) use ($http) {
+                        $data['href'] = $node->filter('div.con > div.tit > a')->attr('href');
+                        $data['title'] = $node->filter('div.con > div.tit > a')->text();
 //                            $data['author'] = $node->filter('li > div.r_info > div.furt > span.zuozhe')->text();
                         $data['created_at'] = date('Y-m-d H:i:s');
                         $data['updated_at'] = date('Y-m-d H:i:s');
@@ -114,30 +115,31 @@ class SpiderController extends Controller
                 $crawler = new Crawler();
                 $crawler->addHtmlContent($http);
                 $data['title'] = $this->gettitle($http);
-                $data['author'] = '我的世界';
+//                $data['title']=$this->title[$index]->title;
+                $data['author'] = '游戏资讯';
                 try{
                     $data['keywords'] = $crawler->filter('head > meta:nth-child(12)')->attr('content');
                 }catch (\Exception $e){
-                    $data['keywords'] = '我的世界';
+                    $data['keywords'] = '游戏资讯';
                 }
                 try{
-                    $data['description'] = $crawler->filter('head > meta:nth-child(3)')->attr('content');
+                    $data['description'] = $crawler->filter('head > meta:nth-child(8)')->attr('content');
                 }catch (\Exception $e){
                     $data['description'] = $this->gettitle($http);
                 }
                 $data['content'] = $this->getbody($http);
 
-                $data['comuln_id'] = 3;
+                $data['comuln_id'] = 1;
                 $data['created_at'] = date('Y-m-d');
                 $data['updated_at'] = date('Y-m-d');
 
-
+//                dd($data['content']);
 
 
 //                $txt = $data['title'].'#######'.$this->chuli($data['content']).chr(10);
 //                $bool = fwrite($file,$txt);
                 try{
-                    $bool = DB::table('sp_content')->insert($data);
+                    $bool = DB::table('content')->insert($data);
                 }catch (\Exception $e){
                     dd($e);
                     $bool = false;
@@ -177,9 +179,9 @@ class SpiderController extends Controller
     function gettitle($html){
 
         echo '正在截取标题'.'<br>';
-        $str = substr($html,strpos($html,'<h1>'));
+        $str = substr($html,strpos($html,'<h1 class="news_h1">'));
         $h1 = substr($str,0,strpos($str,'</h1>')+5);
-        $t = substr($h1,23);
+        $t = substr($h1,20);
         $title = substr($t,0,strpos($t,'</h1>'));
         echo '截取成功！！'.'<br>';
         echo $title.'<br>';
@@ -192,7 +194,7 @@ class SpiderController extends Controller
 
 
         echo '正在截取文章内容'.'<br>';
-        $t = substr($ta,strpos($ta,'<div id="content">')+18);
+        $t = substr($ta,strpos($ta,'<div class="news_contet">')+25);
         $t = substr($t,0,strpos($t,'</div>'));
         echo '截取成功！！'.'<br>';
         return $t;
