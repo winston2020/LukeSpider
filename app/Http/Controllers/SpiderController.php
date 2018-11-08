@@ -22,8 +22,9 @@ class SpiderController extends Controller
     {
         set_time_limit(0);
         ini_set('memory_limit', '128M');
-        for ($i=1;$i<852;$i++){
-            $this->url[] = 'http://minecraft.yxzoo.com/gl_'.$i;
+        for ($i=1;$i<1764;$i++){
+            $this->url[] = 'https://www.newyx.net/news/list'.$i.'htm';
+//            $this->url[] = 'https://www.autotimes.com.cn/news/'.$i.'html';
         }
         $this->totalPageCount = 1500;
         $client = new Client();
@@ -53,9 +54,10 @@ class SpiderController extends Controller
                 if(!empty($http)){
                     $crawler = new Crawler();
                     $crawler->addHtmlContent($http);
-                    $arr = $crawler->filter('#list > dl')->each(function ($node,$i) use ($http) {
-                        $data['href'] = $node->filter('dt > a')->attr('href');
-                        $data['title'] = $node->filter('dt > a')->text();
+                    dd(123);
+                    $arr = $crawler->filter('body > div.auto_wz_1 > div > div > div.auto_wz_3 > div.auto_wz_5')->each(function ($node,$i) use ($http) {
+                        $data['href'] = $node->filter('div.auto_wz_6 > a')->attr('href');
+                        $data['title'] = $node->filter('div.auto_wz_6 > a')->text();
 //                            $data['author'] = $node->filter('li > div.r_info > div.furt > span.zuozhe')->text();
                         $data['created_at'] = date('Y-m-d H:i:s');
                         $data['updated_at'] = date('Y-m-d H:i:s');
