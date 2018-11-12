@@ -23,8 +23,8 @@ class SpiderController extends Controller
         set_time_limit(0);
         ini_set('memory_limit', '128M');
 
-        for ($i=1;$i<50;$i++){
-            $this->url[] = 'https://www.newyx.net/news/list_'.$i.'.htm';
+        for ($i=1;$i<101;$i++){
+            $this->url[] = 'http://xin.18183.com/news/list_906_'.$i.'.html';
         }
         $this->totalPageCount = 1500;
         $client = new Client();
@@ -55,10 +55,9 @@ class SpiderController extends Controller
                     $crawler = new Crawler();
                     $crawler->addHtmlContent($http);
 
-                    dd(1);
-                    $arr = $crawler->filter('#pc-game > div.wrap1120.mt30.cl > div.w750.Mid2_L > ul > li')->each(function ($node,$i) use ($http) {
-                        $data['href'] = $node->filter('div.con > div.tit > a')->attr('href');
-                        $data['title'] = $node->filter('div.con > div.tit > a')->text();
+                    $arr = $crawler->filter('body > div.main > div.struct_wrap > div.struct_cleft.game_list_news > div.news_list > dl')->each(function ($node,$i) use ($http) {
+                        $data['href'] = $node->filter('dd > h4 > a')->attr('href');
+                        $data['title'] = $node->filter('dd > h4 > a')->text();
 //                            $data['author'] = $node->filter('li > div.r_info > div.furt > span.zuozhe')->text();
                         $data['created_at'] = date('Y-m-d H:i:s');
                         $data['updated_at'] = date('Y-m-d H:i:s');
@@ -118,18 +117,18 @@ class SpiderController extends Controller
 //                $data['title']=$this->title[$index]->title;
                 $data['author'] = '游戏资讯';
                 try{
-                    $data['keywords'] = $crawler->filter('head > meta:nth-child(12)')->attr('content');
+                    $data['keywords'] = $crawler->filter('head > meta:nth-child(4)')->attr('content');
                 }catch (\Exception $e){
                     $data['keywords'] = '游戏资讯';
                 }
                 try{
-                    $data['description'] = $crawler->filter('head > meta:nth-child(8)')->attr('content');
+                    $data['description'] = $crawler->filter('head > meta:nth-child(5)')->attr('content');
                 }catch (\Exception $e){
                     $data['description'] = $this->gettitle($http);
                 }
                 $data['content'] = $this->getbody($http);
 
-                $data['comuln_id'] = 1;
+                $data['comuln_id'] = 2;
                 $data['created_at'] = date('Y-m-d');
                 $data['updated_at'] = date('Y-m-d');
 
@@ -179,9 +178,9 @@ class SpiderController extends Controller
     function gettitle($html){
 
         echo '正在截取标题'.'<br>';
-        $str = substr($html,strpos($html,'<h1 class="news_h1">'));
+        $str = substr($html,strpos($html,'<h1>'));
         $h1 = substr($str,0,strpos($str,'</h1>')+5);
-        $t = substr($h1,20);
+        $t = substr($h1,4);
         $title = substr($t,0,strpos($t,'</h1>'));
         echo '截取成功！！'.'<br>';
         echo $title.'<br>';
@@ -192,10 +191,16 @@ class SpiderController extends Controller
     function getbody($ta){
 
 
-
+        if (strpos($ta,'<div class="content_p txtlist">')!==false){
+            echo '正在截取文章内容'.'<br>';
+            $t = substr($ta,strpos($ta,'<div class="content_p txtlist">'));
+            $t = substr($t,0,strpos($t,'</div>'));
+            echo '截取成功！！'.'<br>';
+            return $t;
+        }
         echo '正在截取文章内容'.'<br>';
-        $t = substr($ta,strpos($ta,'<div class="news_contet">')+25);
-        $t = substr($t,0,strpos($t,'</div>'));
+        $t = substr($ta,strpos($ta,'<p>'));
+        $t = substr($t,0,strpos($t,'<!-- 更多精彩 -->'));
         echo '截取成功！！'.'<br>';
         return $t;
     }

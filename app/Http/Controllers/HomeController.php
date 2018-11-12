@@ -22,16 +22,9 @@ class HomeController extends Controller
         }else{
             $this->domain = $this->host;
         }
-        $file = @fopen(public_path('outlink/url.txt'),'r');
-        $i = 0;
-        $this->outlink = array();
-        while (!feof($file)){
-            $line = fgets($file);
-            if($line){
-                $this->outlink[$i] = $line;
-                $i++;
-            }
-        }
+
+        $this->outlink = DB::table('outlink')->get()->toArray();
+
 
     }
 

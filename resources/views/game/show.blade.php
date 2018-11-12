@@ -214,15 +214,17 @@
             border-right: none;
         }
     </style>
+    @if(empty($ontlink) !== true)
     <div style="width: 60%;margin-left: 20%;height: 100px;">
         <div style="font-weight: bolder">友情链接</div>
         <div class="links">
-            @for($i=0;$i<15;$i++)
-            <a href="">testing</a>
+            @foreach($outlink as $value)
+            <a href="{{$value->href}}">{{$value->title}}</a>
             <span style="color: #cccccc;padding:0 3px">|</span>
-            @endfor
+            @endforeach
         </div>
     </div>
+    @endif
     {{--outlink end--}}
 
     <!--foot start-->
